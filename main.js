@@ -1,14 +1,19 @@
+ //Conexión con HTML
+ 
  const canvas = document.querySelector('canvas')
  const ctx = canvas.getContext('2d')
- const obstacles = []
- const shoots = [];
+ 
+ //Variables Globales
 
+ const obstaclesArr = []
+ const shootsArr = [];
+ const friction = 0.002
  let interval
  let frames = 0
  let score = 0
  let keys = [];
- 
- 
+
+
  const imgs = {
    character1: './imagenes/tierra100.png',
    character2: './imagenes/Copia de Nave1.png',
@@ -18,10 +23,12 @@
    background: './imagenes/universo.png',
    asteroide1: './imagenes/0492.png',
    asteroide2: './imagenes/b06ae99d174d7f3.png',
-   disparo: './imagenes/Captura de Pantalla 2020-01-21 a la(s) 18.44.09.png'
+   rocket: './imagenes/Captura de Pantalla 2020-01-21 a la(s) 18.44.09.png'
  }
  
- class Background {
+//Constructores
+
+class Background {
    constructor() {
      this.x = 0
      this.y = 0
@@ -43,7 +50,7 @@
    }
  }
  
- class Player{
+class Player{
      constructor(x,y,cwidth,cheight){
      this.x = 500
      this.y = 200
@@ -59,34 +66,13 @@
     draw(){
     ctx.drawImage(this.img, this.x, this.y, this.width, this.height)
  }
- damage() {
-  this.hp = this.hp - 35
+ isTouching(obstacle) {
+  return  (this.x < obstacle.x + obstacle.width - 10) &&
+          (this.x + this.width > obstacle.x + 10) &&
+          (this.y < obstacle.y + obstacle.height - 20) &&
+          (this.y + this.height > obstacle.y + 10)
+}    
 }
-
-
-}
-
-class Disparos {
-  constructor(x, y) {
-      this.x = x;
-      this.y = y;
-      this.width = 70;
-      this.height = 15;
-      this.img = new Image();
-      this.img.src = imgs.disparo
-      this.img.onload = () => {
-         ctx.drawImage(this.img, this.x, this.y, this.width, this.height);  
-      }
-    }
-  draw() {
-      this.x += 10;
-      ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
-  }
-  fire() { 
-    this.x += 10;
-    this.img.src = imgs.disparo
-}
-} 
 
 class Ship{
     constructor(){
@@ -94,6 +80,7 @@ class Ship{
         this.y = 100
         this.width = 50
         this.height = 50
+        this.hp = 500
         this.vel = 0
         this.img = new Image()
         this.img.src = imgs.character
@@ -120,86 +107,179 @@ class Ship{
     turnRight() {
         this.x += 50;
         this.img.src = imgs.character2
+    }
+    isTouching(obstacle) {
+      return  (this.x < obstacle.x + obstacle.width - 10) &&
+              (this.x + this.width > obstacle.x + 10) &&
+              (this.y < obstacle.y + obstacle.height - 20) &&
+              (this.y + this.height > obstacle.y + 10)
     }    
 }
 
- class Obstacle {
-   constructor(x, y, imgSrc) {
-     this.x = x
-     this.y = y
-     this.width = 50
-     this.height = 50
-     this.img = new Image()
-     this.img.src = imgSrc
-   }
-   draw() {
-     this.x--
-     ctx.drawImage(this.img, this.x, this.y, this.width, this.height)
-   }
- }
- 
- const universe = new Background()
- const player = new Player()
- const ship = new Ship()
- const shoot = new Disparos()
+class Obstacle {
+  constructor(x, y) {
+    this.x = x
+    this.y = 0
+    this.width = 30
+    this.height = 30
+    this.img = new Image()
+    this.img.src = imgs.asteroide1
+    this.status = 1
+    this.speed = 1
+    this.velY = 0
+    this.img.onload = () => {
+      ctx.drawImage(this.img, this.x, this.y, this.width, this.height)
+  }
+}
+  draw() {
+    ctx.drawImage(this.img, this.x, this.y, this.width, this.height)
+    this.y++
+  }
+  isTouching(bullet) {
+    return  (this.x < bullet.x + bullet.width) &&
+            (this.x + this.width > bullet.x) &&
+            (this.y < bullet.y + bullet.height) &&
+            (this.y + this.height > bullet.y)
+  }
+}
 
- function startGame() {
+class Rocket{
+  constructor(){
+    this.x = +10
+    this.y = +10
+    this.vx = 0
+    this.vy = 0
+    this.width = 30
+    this.height = 30
+    this.img = new Image()
+    this.img.src = imgs.rocket
+    this.img.onload = () => {
+        ctx.drawImage(this.img, this.x, this.y, this.width, this.height)
+    }
+  }
+  draw(){
+    ctx.drawImage(this.img, this.x, this.y + 50, this.width, this.height);
+}
+  shoot() {
+  this.Ship += 50;
+  this.img.src = imgs.rocket
+}    
+}
+
+const universe = new Background()
+const player = new Player()
+const ship = new Ship()
+const rocket = new Rocket()
+
+//Funciones
+
+function generateObstacles() {
+  let roca = 30
+  let randomWidth = Math.floor(Math.random() * canvas.width - roca)
+  if (frames % 30 === 0) {
+    let obs1 = new Obstacle(randomWidth)
+    obstaclesArr.push(obs1)
+  }
+  if (frames % 100 === 0) {
+    let obs1 = new Obstacle(randomWidth)
+    obstaclesArr.push(obs1)
+  }
+}
+
+function drawObstacles() {
+  obstaclesArr.forEach((obstacle) => {
+    if(obstacle.status === 1) obstacle.draw()
+
+    //Obstacle movimiento
+    obstacle.velY
+    obstacle.y += obstacle.velY
+    obstacle.velY *= friction
+  })
+}
+
+function checkCollition() {
+  obstaclesArr.forEach((obstacle) => {
+    if(ship.isTouching(obstacle)&& obstacle.status === 1 || player.isTouching(obstacle)&& obstacle.status === 1 ) {
+      gameOver()
+      console.log('Colision de obstaculo con nave')
+      console.log(obstacle,ship)
+    }
+  })
+}
+
+function gameOver() {
+  clearInterval(interval)
+  console.log('GAME OOOOOVVVVVEEEEEER')
+  gameOverMessague()
+}
+
+function gameOverMessague() {
+  ctx.fillStyle = "#FF0000"
+  ctx.font = "70px Voyager";
+  ctx.fillText(`Game over X__X`, 150, canvas.height / 2)
+}
+
+
+function generateBullets(x, y) {
+  const bullet = new Bullet(x, y)
+  shootsArr.push(bullet)
+}
+
+function drawBullets() {
+  shootsArr.forEach((shoot) => {
+    if(shoot.status === 1) shoot.draw()
+
+    //Obstacle movimiento
+    shoot.velY--
+    shoot.y += shoot.velY
+    shoot.velY *= friction
+  })
+}
+
+function checkCollitionBullets() {
+  shootsArr.forEach((shoot) => {
+    obstaclesArr.forEach((obstacle) => {
+      if(obstacle.isTouching(shoot) && obstacle.status === 1 && shoot.status === 1) {
+        obstacle.status = 0
+        shoot.status = 0
+        console.log('OBSTACLE DESTROYED!!!')
+      }
+    })
+  })
+}
+
+function startGame() {
    if (interval) return
    universe.audio.play()
    interval = setInterval(update, 1000 / 60)
  }
  
- function generateObstacles() {
-    let img, rnd
-    if (frames % 100 === 0) {
-      rnd = Math.random() * canvas.height
-      if (Math.random() >= 0.5) img = imgs.asteroide1
-      else img = imgs.asteroide2
-      obstacles.push(new Obstacle(canvas.width + 100, rnd, img))
-    }
-  }
-  
-  function drawObstacles() {
-    generateObstacles()
-    obstacles.forEach(obstacle => obstacle.draw())
-  }
- 
-  function checkCollitions() {
-    obstacles.forEach((obstacle, idx) => {
-      if (ship.isTouching(obstacle)) {
-        if (obstacle.img.src === imgs.asteroide1) score += 10
-        else score -= 20
-        return obstacles.splice(idx, 1)
-      }
-    })
-  }
- 
-  function drawShoots() {
-    shoots.forEach(shoot => shoot.draw());
-  }
- 
- function update() {
+function update() {
    ctx.clearRect(0, 0, canvas.width, canvas.height)
    universe.draw()
    player.draw()
    ship.draw()
-   shoot.draw()
+   rocket.draw()
+   generateObstacles()
    drawObstacles()
-   //checkCollitions()
+   checkCollition()
+   drawBullets()
+   checkCollitionBullets()
+   drawLife()
    ctx.fillText(String(score), canvas.width - 100, 100)
  }
 
- 
 function drawLife() {
   ctx.fillStyle = 'gray'
   ctx.fillRect(25, 25, 350, 40);
   ctx.fillRect(canvas.width - 375, 25, 350, 40);
   // ctx.drawImage()
   ctx.fillStyle = 'white'
-  ctx.fillRect(30, 30, (340 * character.hp) / 250, 30);
-  ctx.fillRect(canvas.width - 370, 30, (340 * boot.hp) / 250, 30);
+  ctx.fillRect(30, 30, (340 * player.hp) / 250, 30);
+  ctx.fillRect(canvas.width - 370, 30, (340 * ship.hp) / 250, 30);
 }
 
+//Escuchar eventos
 
  document.addEventListener('keydown', ({ keyCode }) => {
    switch (keyCode) {
@@ -219,7 +299,7 @@ function drawLife() {
        return startGame()
 
      case 32:
-       return fire()
+       return rocket.shoot()
     }
  })
 
@@ -232,3 +312,6 @@ function drawLife() {
 //    }
 //  }
 */
+
+update()
+
