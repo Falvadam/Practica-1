@@ -1,12 +1,13 @@
  const canvas = document.querySelector('canvas')
  const ctx = canvas.getContext('2d')
  const obstacles = []
- 
+ const shoots = [];
+
  let interval
  let frames = 0
  let score = 0
  let keys = [];
- let bullets = [];
+ 
  
  const imgs = {
    character1: './imagenes/tierra100.png',
@@ -17,7 +18,7 @@
    background: './imagenes/universo.png',
    asteroide1: './imagenes/0492.png',
    asteroide2: './imagenes/b06ae99d174d7f3.png',
-   bala: './imagenes/Captura de Pantalla 2020-01-21 a la(s) 18.44.09.png'
+   disparo: './imagenes/Captura de Pantalla 2020-01-21 a la(s) 18.44.09.png'
  }
  
  class Background {
@@ -48,7 +49,7 @@
      this.y = 200
      this.width = 230
      this.height = 230
-     this.hp = 1000
+     this.hp = 500
      this.img = new Image()
      this.img.src = imgs.character1
      this.img.onload = () => {
@@ -58,8 +59,34 @@
     draw(){
     ctx.drawImage(this.img, this.x, this.y, this.width, this.height)
  }
- }
- 
+ damage() {
+  this.hp = this.hp - 35
+}
+
+
+}
+
+class Disparos {
+  constructor(x, y) {
+      this.x = x;
+      this.y = y;
+      this.width = 70;
+      this.height = 15;
+      this.img = new Image();
+      this.img.src = imgs.disparo
+      this.img.onload = () => {
+         ctx.drawImage(this.img, this.x, this.y, this.width, this.height);  
+      }
+    }
+  draw() {
+      this.x += 10;
+      ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+  }
+  fire() { 
+    this.x += 10;
+    this.img.src = imgs.disparo
+}
+} 
 
 class Ship{
     constructor(){
@@ -96,30 +123,12 @@ class Ship{
     }    
 }
 
-/*class Disparos{
-  constructor(){
-    this.x = 20
-    this.y = 20
-    this.width = 20
-    this.height = 20
-    this.img = new Image()
-    this.img.src = imgs.bala
-    this.img.onload = () => {
-      ctx.drawImage(this.img, this.x, this.y, this.width, this.height)
-  }
-  draw()
-  ctx.drawImage(this.img, this.x, this.y, this.width, this.height)
-}
-}
-*/
-
-
  class Obstacle {
    constructor(x, y, imgSrc) {
      this.x = x
      this.y = y
-     this.width = 100
-     this.height = 100
+     this.width = 50
+     this.height = 50
      this.img = new Image()
      this.img.src = imgSrc
    }
@@ -132,7 +141,7 @@ class Ship{
  const universe = new Background()
  const player = new Player()
  const ship = new Ship()
- //const bala = new Disparos()
+ const shoot = new Disparos()
 
  function startGame() {
    if (interval) return
@@ -157,48 +166,41 @@ class Ship{
  
   function checkCollitions() {
     obstacles.forEach((obstacle, idx) => {
-      if (nyan.isTouching(obstacle)) {
-        if (obstacle.img.src === imgs.taco) score += 10
+      if (ship.isTouching(obstacle)) {
+        if (obstacle.img.src === imgs.asteroide1) score += 10
         else score -= 20
         return obstacles.splice(idx, 1)
       }
     })
   }
  
+  function drawShoots() {
+    shoots.forEach(shoot => shoot.draw());
+  }
  
  function update() {
    ctx.clearRect(0, 0, canvas.width, canvas.height)
    universe.draw()
    player.draw()
    ship.draw()
-   bala.draw()
+   shoot.draw()
    drawObstacles()
-   checkCollitions()
+   //checkCollitions()
    ctx.fillText(String(score), canvas.width - 100, 100)
  }
 
- /*function fire(){
-     bullets.push({
-       x: character.x - 20, 
-       y: character.y - 20,
-       width: 20,
-       height: 20
-     })
-     
- }
+ 
+function drawLife() {
+  ctx.fillStyle = 'gray'
+  ctx.fillRect(25, 25, 350, 40);
+  ctx.fillRect(canvas.width - 375, 25, 350, 40);
+  // ctx.drawImage()
+  ctx.fillStyle = 'white'
+  ctx.fillRect(30, 30, (340 * character.hp) / 250, 30);
+  ctx.fillRect(canvas.width - 370, 30, (340 * boot.hp) / 250, 30);
+}
 
- /*function dibujarDisparo(){
-   ctx.save();
-   ctx.fillStyle = "white"
-   for(let i in bullets){
-     let disparos = bullets[i]
-     ctx.fillRect(bullets.x, bullets.y, disparos.width, disparos.height)
-   }
-   ctx.restore() 
-  }
-*/
- 
- 
+
  document.addEventListener('keydown', ({ keyCode }) => {
    switch (keyCode) {
      case 39:
@@ -217,19 +219,16 @@ class Ship{
        return startGame()
 
      case 32:
-     return fire()
-   }
+       return fire()
+    }
  })
+
  
-//  document.querySelector('button').onclick = () => {
+/*document.querySelector('button').onclick = () => {
 //    if (canvas.webkitRequestFullScreen) {
 //      canvas.webkitRequestFullScreen()
 //    } else {
 //      canvas.mozRequestFullScreen()
 //    }
 //  }
-
-
-
- update()
- 
+*/
