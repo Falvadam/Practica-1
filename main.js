@@ -14,7 +14,11 @@ let score = 0;
 let keys = [];
 const shoots = [];
 
+
 const imgs = {
+  planeta50: "./imagenes/tierra 50%.png",
+  planeta25: "./imagenes/tierra 25%.png",
+  planeta0: "./imagenes/planeta-explotado-pixilart (1).png",
   character1: "./imagenes/tierra100.png",
   character2: "./imagenes/Copia de Nave1.png",
   character3: "./imagenes/Copia de Nave1 2.png",
@@ -55,7 +59,7 @@ class Player {
     this.y = 200;
     this.width = 230;
     this.height = 230;
-    this.hp = 100;
+    this.hp = 500;
     this.img = new Image();
     this.img.src = imgs.character1;
     this.img.onload = () => {
@@ -65,9 +69,8 @@ class Player {
   draw() {
     ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
   }
-  damage() {
-    this.hp 
-  }
+  planetas(){}
+  
   isTouching(obstacle) {
     return (
       this.x < obstacle.x + obstacle.width - 10 &&
@@ -84,7 +87,7 @@ class Ship {
     this.y = 100;
     this.width = 50;
     this.height = 50;
-    this.hp = 500;
+    this.hp = 50;
     this.vel = 0;
     this.img = new Image();
     this.img.src = imgs.character2;
@@ -123,15 +126,13 @@ class Ship {
     const w = new Rocket(this.x + this.width, this.y + this.height / 2 - 12);
     shoots.push(w);
   }
-  damage() {
-    this.hp = this.hp - 40;
-  }
 }
 class Obstacle {
   constructor(y) {
     this.x = 1300;
     this.y = y;
     this.hp = 30;
+    this.daño = 30;
     this.width = 50;
     this.height = 50;
     this.img = new Image();
@@ -155,10 +156,7 @@ class Obstacle {
       this.y + this.height > Rocket.y
     );
   }
-  damage() {
-    this.hp = this.hp - 40;
   }
-}
 
 class Rocket {
   constructor() {
@@ -218,18 +216,25 @@ function checkCollition() {
       (player.isTouching(obstacle) && obstacle.status === 1) ||
       (rocket.isTouching(obstacle) && obstacle.status === 1)  
       ) {obstaclesArr.splice(index, 1)
-      player.damage      
+        player.hp -= 20
+        if(player.hp === 0){
+          gameOver()
+        }
+
       console.log(player.hp)
       console.log("Colision de obstaculo con nave");
       console.log(obstacle, ship);
     }
     })
-    shoots.forEach((shoot, index)=> {
-      obstaclesArr.forEach(obstacle => {
-        if (obstacle.isTouching(shoot)) shoots.splice(index, 1)
+    shoots.forEach((shoot, i)=> {
+      obstaclesArr.forEach((obstacle, j)  => {
+        if (obstacle.isTouching(shoot)) 
+        {shoots.splice(i, 1)
+          obstaclesArr.splice(j, 1)
+      
+        }
       })
-    })
-  };
+    })}
 
 
 function gameOver() {
@@ -289,18 +294,13 @@ function update() {
   ctx.fillText(String(score), canvas.width - 100, 100);
 }
 
-// function drawLife() {
-//   ctx.fillStyle = "gray";
-//   ctx.fillRect(15, 25, 100, 40);
-//   ctx.fillRect(15, 550, 100, 40);
+function drawLife() {
+  ctx.fillStyle = "gray";
+  ctx.fillRect(15, 25, 200, 40);
 
-//   ctx.fillStyle = "white";
-//   ctx.fillRect(30, 30, (3 * player.hp) / 30, 30);
-//   ctx.fillRect(30, 30, (3 * ship.hp) / 30, 30);
-// }
-
-let health = document.getElementById("health")
-health.value -= 10; 
+  ctx.fillStyle = "white";
+  ctx.fillRect(30, 30, (player.hp * 170) / 500, 30);
+}
 
 document.addEventListener("keydown", ({ keyCode }) => {
   switch (keyCode) {
@@ -333,4 +333,4 @@ document.addEventListener("keydown", ({ keyCode }) => {
  //  }
  */
 
-update();
+update()
