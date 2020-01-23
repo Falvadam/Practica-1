@@ -37,8 +37,7 @@ class Background {
     this.img = new Image();
     this.img.src = imgs.background;
     this.img.onload = () => {
-      this.draw();
-    };
+   this.draw();}
     this.audio = new Audio();
     this.audio.src = "./imagenes/la-brisa_1.mp3";
     this.audio.loop = true;
@@ -52,7 +51,7 @@ class Background {
 
 class Player {
   constructor(x, y, cwidth, cheight) {
-    this.x = 500;
+    this.x = 100;
     this.y = 200;
     this.width = 230;
     this.height = 230;
@@ -67,7 +66,7 @@ class Player {
     ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
   }
   damage() {
-    this.hp = this.hp - 20;
+    this.hp 
   }
   isTouching(obstacle) {
     return (
@@ -124,14 +123,14 @@ class Ship {
     const w = new Rocket(this.x + this.width, this.y + this.height / 2 - 12);
     shoots.push(w);
   }
-  damage1() {
+  damage() {
     this.hp = this.hp - 40;
   }
 }
 class Obstacle {
-  constructor(x, y) {
-    this.x = x;
-    this.y = 0;
+  constructor(y) {
+    this.x = 1300;
+    this.y = y;
     this.hp = 30;
     this.width = 50;
     this.height = 50;
@@ -144,9 +143,9 @@ class Obstacle {
       ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
     };
   }
-  draw() {
+  draw() { 
     ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
-    this.y++;
+    this.x--;
   }
   isTouching(Rocket) {
     return (
@@ -156,34 +155,35 @@ class Obstacle {
       this.y + this.height > Rocket.y
     );
   }
-  damage1() {
+  damage() {
     this.hp = this.hp - 40;
   }
 }
+
 class Rocket {
   constructor() {
     this.x = ship.x;
     this.y = ship.y;
-    // this.vx = 0
-    // this.vy = 0
     this.width = 30;
     this.height = 30;
     this.img = new Image();
     this.img.src = imgs.rocket;
-    //  this.img.onload = () => {
-    //    // ctx.drawImage(this.img, this.x, this.y, this.width, this.height)
-    //  }
   }
   draw() {
     this.x += 10;
-    ctx.drawImage(this.img, this.x, this.y + 50, this.width, this.height);
+    ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
   }
-  //   shoot() {
-  //   this.Ship += 50;
-  //   this.img.src = imgs.rocket
-  // }
+  isTouching(obstacle) {
+    return (
+      this.x < Rocket.x + Rocket.width &&
+      this.x + this.width > Rocket.x &&
+      this.y < Rocket.y + Rocket.height &&
+      this.y + this.height > Rocket.y
+    );
+  }
 }
 
+const dañoAste = -10
 const universe = new Background();
 const player = new Player();
 const ship = new Ship();
@@ -193,7 +193,7 @@ const rocket = new Rocket();
 
 function generateObstacles() {
   let roca = 30;
-  let randomWidth = Math.floor(Math.random() * canvas.width);
+  let randomWidth = Math.floor(Math.random() * canvas.height);
   if (frames % 50 === 0) {
     let obs1 = new Obstacle(randomWidth);
     obstaclesArr.push(obs1);
@@ -212,28 +212,25 @@ function drawObstacles() {
 }
 
 function checkCollition() {
-  obstaclesArr.forEach(obstacle => {
+  obstaclesArr.forEach((obstacle,index) => {
     if (
       (ship.isTouching(obstacle) && obstacle.status === 1) ||
-      (player.isTouching(obstacle) && obstacle.status === 1)
-    ) {
-      gameOver();
+      (player.isTouching(obstacle) && obstacle.status === 1) ||
+      (rocket.isTouching(obstacle) && obstacle.status === 1)  
+      ) {obstaclesArr.splice(index, 1)
+      player.damage      
+      console.log(player.hp)
       console.log("Colision de obstaculo con nave");
       console.log(obstacle, ship);
     }
-  });
-}
+    })
+    shoots.forEach((shoot, index)=> {
+      obstaclesArr.forEach(obstacle => {
+        if (obstacle.isTouching(shoot)) shoots.splice(index, 1)
+      })
+    })
+  };
 
-// shoots.forEach((obstacle, index) => {
-//   if (obstacle.touchPlayer(obstacle)) {
-//     shoots.splice(index, 1);
-//     player.damage();
-//   }
-// });
-
-// if (player.hp === 0) {
-//   gameOver();
-// }
 
 function gameOver() {
   clearInterval(interval);
@@ -253,15 +250,6 @@ function generateBullets(x, y) {
 
 function drawBullets() {
   shoots.forEach(shoot => shoot.draw());
-
-  // shootsArr.forEach((shoot) => {
-  //   if(shoot.status === 1) shoot.draw()
-
-  //   //Obstacle movimiento
-  //   shoot.velY--
-  //   shoot.y += shoot.velY
-  //   shoot.velY *= friction
-  // })
 }
 
 function checkCollitionBullets() {
@@ -292,8 +280,6 @@ function update() {
   universe.draw();
   player.draw();
   ship.draw();
-  //rocket.draw()
-  //shoot.draw()
   generateObstacles();
   drawObstacles();
   checkCollition();
@@ -303,17 +289,18 @@ function update() {
   ctx.fillText(String(score), canvas.width - 100, 100);
 }
 
-function drawLife() {
-  ctx.fillStyle = "gray";
-  ctx.fillRect(25, 25, 30, 40);
-  ctx.fillRect(30, 25, 30, 40);
+// function drawLife() {
+//   ctx.fillStyle = "gray";
+//   ctx.fillRect(15, 25, 100, 40);
+//   ctx.fillRect(15, 550, 100, 40);
 
-  ctx.fillStyle = "white";
-  ctx.fillRect(30, 30, (30 * player.hp) / 30, 30);
-  ctx.fillRect(30, 30, (30 * ship.hp) / 30, 30);
-}
+//   ctx.fillStyle = "white";
+//   ctx.fillRect(30, 30, (3 * player.hp) / 30, 30);
+//   ctx.fillRect(30, 30, (3 * ship.hp) / 30, 30);
+// }
 
-//Escuchar eventos
+let health = document.getElementById("health")
+health.value -= 10; 
 
 document.addEventListener("keydown", ({ keyCode }) => {
   switch (keyCode) {
