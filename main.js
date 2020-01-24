@@ -14,7 +14,8 @@ let score = 0;
 let keys = [];
 const shoots = [];
 let timerText = 'Timer:'
-let timer = 150
+let timer = 10
+const final = "///Users/macbookpro/Desktop/ironhack/Juego/GameOver.html"
 
 const imgs = {
   naveizq: "./imagenes/Copia de Nave_Enemiga-1 3.png",
@@ -86,7 +87,7 @@ class Player {
       this.img.src = imgs.planeta0
     }
     this.img.onload = () => {
-      ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+      ctx.drawImage(this.img.src, this.x, this.y, this.width, this.height);
   }
   }
 
@@ -191,6 +192,7 @@ class Ship1 {
   shoot() {
     const w = new Rocket(this.x + this.width, this.y + this.height / 2 - 12);
     shoots.push(w);
+  
   }
 }
 
@@ -327,16 +329,12 @@ function checkstatustime() {
 
 function gameOver() {
   clearInterval(interval);
-  console.log("GAME OOOOOVVVVVEEEEEER");
-  gameOverMessague();
-  document.querySelector("inicio");
+  abrir_Popup()
 }
 
-function gameOverMessague() {
-  ctx.fillStyle = "#FF0000";
-  ctx.font = "70px Voyager";
+// function gameOverMessague() {
 
-}
+
 
 function generateBullets(x, y) {
   shoots.forEach(shoot => shoot.draw());
@@ -361,6 +359,13 @@ function checkCollitionBullets() {
     });
   });
 }
+
+var objeto_window_referencia;
+var configuracion_ventana = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
+
+function abrir_Popup() {
+  objeto_window_referencia = window.open("./GameOver.html", "ThrillerSpace", configuracion_ventana);
+}              
 
 function startGame() {
   if (interval) return;
@@ -428,6 +433,7 @@ document.addEventListener("keydown", ({ keyCode }) => {
 
     case 69:
       return ship1.shoot1();
+
   }
 })
 
