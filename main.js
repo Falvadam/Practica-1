@@ -436,8 +436,6 @@ document.addEventListener("keydown", ({ keyCode }) => {
 
   }
 })
-
-
 /*document.querySelector('button').onclick = () => {
  //    if (canvas.webkitRequestFullScreen) {
  //      canvas.webkitRequestFullScreen()
