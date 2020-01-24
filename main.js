@@ -14,7 +14,7 @@ let score = 0;
 let keys = [];
 const shoots = [];
 let timerText = 'Timer:'
-let timer = 10
+let timer = 30
 const final = "///Users/macbookpro/Desktop/ironhack/Juego/GameOver.html"
 
 const imgs = {
@@ -322,7 +322,7 @@ function checkstatustime() {
     timer -= 1
     console.log(timer)
     if (timer == 0) {
-        return gameOver()
+        return gameWin()
     }
     }
 
@@ -330,6 +330,11 @@ function checkstatustime() {
 function gameOver() {
   clearInterval(interval);
   abrir_Popup()
+}
+
+function gameWin(){
+clearInterval(interval)
+abrir_Popup2()
 }
 
 // function gameOverMessague() {
@@ -360,11 +365,19 @@ function checkCollitionBullets() {
   });
 }
 
-var objeto_window_referencia;
+var objeto_window_referencia1;
 var configuracion_ventana = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
 
 function abrir_Popup() {
-  objeto_window_referencia = window.open("./GameOver.html", "ThrillerSpace", configuracion_ventana);
+  objeto_window_referencia1 = window.open("./GameOver.html", "ThrillerSpace", configuracion_ventana);
+}    
+
+
+var objeto_window_referencia1;
+var configuracion_ventana = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
+
+function abrir_Popup2() {
+  objeto_window_referencia1 = window.open("./gameWin.html", "ThrillerSpace", configuracion_ventana);
 }              
 
 function startGame() {
@@ -436,13 +449,13 @@ document.addEventListener("keydown", ({ keyCode }) => {
 
   }
 })
-/*document.querySelector('button').onclick = () => {
- //    if (canvas.webkitRequestFullScreen) {
- //      canvas.webkitRequestFullScreen()
- //    } else {
- //      canvas.mozRequestFullScreen()
- //    }
- //  }
- */
+// document.querySelector('button').onclick = () => {
+//      if (canvas.webkitRequestFullScreen) {
+//       canvas.webkitRequestFullScreen()
+//      } else {
+//        canvas.mozRequestFullScreen()
+//      }
+//    }
+ 
 
 update()
