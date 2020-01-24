@@ -190,9 +190,8 @@ class Ship1 {
     );
   }
   shoot() {
-    const w = new Rocket(this.x + this.width, this.y + this.height / 2 - 12);
-    shoots.push(w);
-  
+    const a = new Rocket(this.x + this.width, this.y + this.height / 2 - 12);
+    shoots.push(a);
   }
 }
 
@@ -373,11 +372,11 @@ function abrir_Popup() {
 }    
 
 
-var objeto_window_referencia1;
+var objeto_window_referencia2;
 var configuracion_ventana = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
 
 function abrir_Popup2() {
-  objeto_window_referencia1 = window.open("./gameWin.html", "ThrillerSpace", configuracion_ventana);
+  objeto_window_referencia2 = window.open("./gameWin.html", "ThrillerSpace", configuracion_ventana);
 }              
 
 function startGame() {
