@@ -1,1 +1,110 @@
-*/
+
+/*pagina de inicio*/  
+
+.name{
+    position: absolute;
+    top: 150px;
+    left: 340px;
+}
+
+.fondo{
+    position: absolute;
+}
+
+.boton1{
+    position: absolute;
+    text-align: center;
+    top: 450px;
+    left: 550px;
+    width: 250px;
+    height: 100px;
+    border-radius: 10%;     
+}
+
+
+/*instrucciones*/
+
+.esquinalogo{
+    position: absolute;
+
+}
+
+.boton2{
+    position: absolute;
+    text-align: center;
+    top: 580px;
+    left: 900px;
+    width: 250px;
+    height: 100px;
+    
+}
+
+h1{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    position: absolute;
+    font-size: 50px;
+    color: white;
+    left: 310px;
+    text: 100px;px;
+}
+
+video{
+    position: absolute;
+    width: 500;
+    height: 500;
+    top: 200px;
+    left: 250px;
+}
+
+.teclas{
+    position: absolute;
+    top: 230px;
+    left: 700px;
+    
+}
+
+.space{
+    position: absolute;
+    top: 350px;
+    left: 700px;
+}
+
+.textodirecciones{
+    position: absolute;
+    top: 200px;
+    left: 960px;
+    text-align: center;
+    font-size: 40px;
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    line-height: 120px;
+}
+
+
+/*Game Over pa*/
+
+.boton3{
+    position: absolute;
+    text-align: center;
+    top: 50px;
+    left: 780px;
+    width: 250px;
+    height: 100px;
+    
+}
+
+.boton4{
+    position: absolute;
+    text-align: center;
+    top: 550px;
+    left: 50px;
+    width: 250px;
+    height: 100px;
+    
+}
+
+.zorro{
+    position: absolute;
+    top: 600px;
+    left: 620px;
+}
