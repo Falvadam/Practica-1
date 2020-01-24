@@ -13,9 +13,14 @@ let frames = 0;
 let score = 0;
 let keys = [];
 const shoots = [];
-
+let timerText = 'Timer:'
+let timer = 150
 
 const imgs = {
+  naveizq: "./imagenes/Copia de Nave_Enemiga-1 3.png",
+  naveaba: "./imagenes/Copia de Nave_Enemiga-1 2.png",
+  naveder: "./imagenes/Copia de Nave_Enemiga-1.png",
+  nave2arr: "./imagenes/Nave_Enemiga-1.png",
   planeta50: "./imagenes/tierra 50%.png",
   planeta25: "./imagenes/tierra 25%.png",
   planeta0: "./imagenes/planeta-explotado-pixilart (1).png",
@@ -27,7 +32,8 @@ const imgs = {
   background: "./imagenes/universo.png",
   asteroide1: "./imagenes/0492.png",
   asteroide2: "./imagenes/b06ae99d174d7f3.png",
-  rocket: "./imagenes/Captura de Pantalla 2020-01-21 a la(s) 18.44.09.png"
+  rocket: "./imagenes/Captura de Pantalla 2020-01-21 a la(s) 18.44.09.png",
+  gameO: "./imagenes/DTSsNQDWkAAp0aE.jpg_large"
 };
 
 //Constructores
@@ -41,7 +47,7 @@ class Background {
     this.img = new Image();
     this.img.src = imgs.background;
     this.img.onload = () => {
-   this.draw();}
+    this.draw();}
     this.audio = new Audio();
     this.audio.src = "./imagenes/la-brisa_1.mp3";
     this.audio.loop = true;
@@ -61,7 +67,7 @@ class Player {
     this.height = 230;
     this.hp = 500;
     this.img = new Image();
-    this.img.src = imgs.character1;
+    this.img.src = imgs.character1
     this.img.onload = () => {
       ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
     };
@@ -69,8 +75,21 @@ class Player {
   draw() {
     ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
   }
-  planetas(){}
-  
+  planetas(){
+    if(this.hp == 500){
+     this.img.src = imgs.character
+    }if(this.hp == 400){
+      this.img.src = imgs.planeta50
+    }if(this.hp == 170){
+      this.img.src = imgs.planeta25
+    }if(this.hp == 50){
+      this.img.src = imgs.planeta0
+    }
+    this.img.onload = () => {
+      ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+  }
+  }
+
   isTouching(obstacle) {
     return (
       this.x < obstacle.x + obstacle.width - 10 &&
@@ -127,6 +146,55 @@ class Ship {
     shoots.push(w);
   }
 }
+
+class Ship1 {
+  constructor() {
+    this.x = 100;
+    this.y = 100;
+    this.width = 50;
+    this.height = 50;
+    this.hp = 50;
+    this.vel = 0;
+    this.img = new Image();
+    this.img.src = imgs.nave2arr;
+    this.img.onload = () => {
+      ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+    };
+  }
+  draw() {
+    ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+  }
+  accelerate1() {
+    this.y -= 50;
+    this.img.src = imgs.nave2arr;
+  }
+  brake1() {
+    this.y += 50;
+    this.img.src = imgs.naveaba;
+  }
+  turnLeft1() {
+    this.x -= 50;
+    this.img.src = imgs.naveizq;
+  }
+  turnRight1() {
+    this.x += 50;
+    this.img.src = imgs.naveder;
+  }
+  isTouching(obstacle) {
+    return (
+      this.x < obstacle.x + obstacle.width - 10 &&
+      this.x + this.width > obstacle.x + 10 &&
+      this.y < obstacle.y + obstacle.height - 20 &&
+      this.y + this.height > obstacle.y + 10
+    );
+  }
+  shoot() {
+    const w = new Rocket(this.x + this.width, this.y + this.height / 2 - 12);
+    shoots.push(w);
+  }
+}
+
+
 class Obstacle {
   constructor(y) {
     this.x = 1300;
@@ -180,19 +248,17 @@ class Rocket {
     );
   }
 }
-
-const dañoAste = -10
 const universe = new Background();
 const player = new Player();
 const ship = new Ship();
+const ship1 = new Ship1();
 const rocket = new Rocket();
-
 //Funciones
 
 function generateObstacles() {
   let roca = 30;
   let randomWidth = Math.floor(Math.random() * canvas.height);
-  if (frames % 50 === 0) {
+  if (frames % 5 === 0) {
     let obs1 = new Obstacle(randomWidth);
     obstaclesArr.push(obs1);
   }
@@ -213,6 +279,7 @@ function checkCollition() {
   obstaclesArr.forEach((obstacle,index) => {
     if (
       (ship.isTouching(obstacle) && obstacle.status === 1) ||
+      (ship1.isTouching(obstacle) && obstacle.status === 1) ||
       (player.isTouching(obstacle) && obstacle.status === 1) ||
       (rocket.isTouching(obstacle) && obstacle.status === 1)  
       ) {obstaclesArr.splice(index, 1)
@@ -236,17 +303,39 @@ function checkCollition() {
       })
     })}
 
+function drawSeconds() {
+  timer.toString()
+  ctx.font = '30px Arial'
+  ctx.fillStyle = 'white'
+  ctx.fillText(timer, 1050, 100, 300)
+}
+
+function drawTimer() {
+     ctx.font = '30px Arial'
+      ctx.fillStyle = 'white'
+      ctx.fillText(timerText + timer, 950, 100, 300)
+}
+
+function checkstatustime() {
+    timer -= 1
+    console.log(timer)
+    if (timer == 0) {
+        return gameOver()
+    }
+    }
+
 
 function gameOver() {
   clearInterval(interval);
   console.log("GAME OOOOOVVVVVEEEEEER");
   gameOverMessague();
+  document.querySelector("inicio");
 }
 
 function gameOverMessague() {
   ctx.fillStyle = "#FF0000";
   ctx.font = "70px Voyager";
-  ctx.fillText(`Game over X__X`, 150, canvas.height / 2);
+
 }
 
 function generateBullets(x, y) {
@@ -277,21 +366,24 @@ function startGame() {
   if (interval) return;
   universe.audio.play();
   interval = setInterval(update, 1000 / 60);
+  intervals = setInterval(checkstatustime, 1000 )
 }
 
 function update() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   frames++;
   universe.draw();
+  drawTimer();
   player.draw();
   ship.draw();
+  ship1.draw();
+  // checkstatustime()
   generateObstacles();
   drawObstacles();
   checkCollition();
   drawBullets();
   checkCollitionBullets();
   drawLife();
-  ctx.fillText(String(score), canvas.width - 100, 100);
 }
 
 function drawLife() {
@@ -321,8 +413,24 @@ document.addEventListener("keydown", ({ keyCode }) => {
 
     case 32:
       return ship.shoot();
+    
+    case 68:
+      return ship1.turnRight1();
+
+    case 87:
+      return ship1.accelerate1();
+
+    case 65:
+      return ship1.turnLeft1();
+
+    case 83:
+      return ship1.brake1();
+
+    case 69:
+      return ship1.shoot1();
   }
-});
+})
+
 
 /*document.querySelector('button').onclick = () => {
  //    if (canvas.webkitRequestFullScreen) {
